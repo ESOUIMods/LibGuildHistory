@@ -2,6 +2,7 @@ LibGuildHistoryCache = {}
 LibGuildHistoryCache.name = 'LibGuildHistoryCache'
 LibGuildHistoryCache.version = '1.0'
 LibGuildHistoryCache.client_lang = GetCVar("language.2")
+LibGuildHistoryCache.megaserver = GetWorldName()
 LibGuildHistoryCache.isScanning = false
 LibGuildHistoryCache.isScanningParallel = {}
 LibGuildHistoryCache.guildhistory = {}
@@ -13,7 +14,9 @@ LibGuildHistoryCache.guild_info = {
   [4] = { guild_id = 0, guild_name = 0, },
   [5] = { guild_id = 0, guild_name = 0, },
 }
-LibGuildHistoryCache.guild_history = {}
+LibGuildHistoryCache_Data = {
+ [LibGuildHistoryCache.megaserver] = {},
+}
 
 if LibDebugLogger then
   local logger = LibDebugLogger.Create(LibGuildHistoryCache.name)

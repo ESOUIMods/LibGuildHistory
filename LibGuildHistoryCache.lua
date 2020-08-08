@@ -1,4 +1,4 @@
-local num_guilds
+local megaserver = LibGuildHistoryCache.megaserver
 
 function LibGuildHistoryCache:get_guild_info()
   local nextGuildID = GetGuildId(nextGuild)
@@ -11,13 +11,25 @@ function LibGuildHistoryCache:get_guild_info()
   end
 end
 
-function LibGuildHistoryCache:request_scan(guild_to_scan)
-  if LibGuildHistoryCache.guild_history[guild_to_scan] == nil then LibGuildHistoryCache.guild_history[guild_to_scan] = {} end
-  LibGuildHistoryCache.guild_history[guild_to_scan] = GetGuildEventInfo(guild_to_scan, GUILD_HISTORY_STORE)
+--- Returns a guild events unique id
+function LibGuildHistoryCache:get_guild_event_id(guild_to_scan, category, event_index)
+    local event_id = GetGuildEventId(guild_to_scan, category, event_index)
+    return tonumber(Id64ToString(eventId))
 end
 
-function LibGuildHistoryCache:start_scan()
-  LibGuildHistoryCache:request_scan(LibGuildHistoryCache.guild_info[4].guild_id, GUILD_HISTORY_STORE)
+--- Handle Guild History Evert
+local function OnGuildHistoryEvent(event_code, guild_id, category)
+    if (event_code ~= EVENT_GUILD_HISTORY_RESPONSE_RECEIVED) then
+        return
+    end
+   LibGuildHistoryCache.dm("Debug", "OnGuildHistoryEvent")
+   LibGuildHistoryCache.dm("Debug", string.format("%s %s %s", event_code, guild_id, category))
+end
+EVENT_MANAGER:RegisterForEvent(LibGuildHistoryCache.name, EVENT_GUILD_HISTORY_RESPONSE_RECEIVED, OnGuildHistoryEvent)
+
+function LibGuildHistoryCache:request_page(guild_to_scan, category, event_index)
+    local event_id = GetGuildEventId(guild_to_scan, category, event_index)
+    return tonumber(Id64ToString(eventId))
 end
 
 local function OnAddOnLoaded(eventCode, addOnName)
@@ -25,8 +37,6 @@ local function OnAddOnLoaded(eventCode, addOnName)
    LibGuildHistoryCache.dm("Debug", "LibGuildHistoryCache Loaded")
    -- setup guild names and get guild IDs first
    LibGuildHistoryCache:get_guild_info()
-   -- start scan for test guild
-   LibGuildHistoryCache:start_scan()
+   RequestPage
 end
 EVENT_MANAGER:RegisterForEvent(LibGuildHistoryCache.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
-
