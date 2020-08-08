@@ -1,21 +1,36 @@
 LibGuildHistoryCache = {}
 LibGuildHistoryCache.name = 'LibGuildHistoryCache'
 LibGuildHistoryCache.version = '1.0'
-LibGuildHistoryCache.client_lang = GetCVar("language.2")
+LibGuildHistoryCache.clientLang = GetCVar("language.2")
 LibGuildHistoryCache.megaserver = GetWorldName()
 LibGuildHistoryCache.isScanning = false
 LibGuildHistoryCache.isScanningParallel = {}
-LibGuildHistoryCache.guildhistory = {}
-LibGuildHistoryCache.number_of_guilds = 0
-LibGuildHistoryCache.guild_info = {
-  [1] = { guild_id = 0, guild_name = 0, },
-  [2] = { guild_id = 0, guild_name = 0, },
-  [3] = { guild_id = 0, guild_name = 0, },
-  [4] = { guild_id = 0, guild_name = 0, },
-  [5] = { guild_id = 0, guild_name = 0, },
+LibGuildHistoryCache.guildHistory = {}
+LibGuildHistoryCache.numberOfGuilds = 0
+LibGuildHistoryCache.guildInfo = {
+  [1] = { guildId = 0, guildName = 0, },
+  [2] = { guildId = 0, guildName = 0, },
+  [3] = { guildId = 0, guildName = 0, },
+  [4] = { guildId = 0, guildName = 0, },
+  [5] = { guildId = 0, guildName = 0, },
 }
-LibGuildHistoryCache_Data = {
+LibGuildHistoryCache.data = {
  [LibGuildHistoryCache.megaserver] = {},
+}
+LibGuildHistoryCache.categoryEnum = {
+  GUILD_HISTORY_GENERAL = 1,
+  GUILD_HISTORY_BANK = 2,
+  GUILD_HISTORY_STORE = 3,
+  GUILD_HISTORY_COMBAT = 4,
+  GUILD_HISTORY_ALLIANCE_WAR = 5,
+}
+
+LibGuildHistoryCache.categoryText = {
+  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_ALLIANCE_WAR] = "Alliance War",
+  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_BANK] = "Bank",
+  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_COMBAT] = "Combat",
+  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_GENERAL] = "General",
+  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_STORE] = "Store",
 }
 
 if LibDebugLogger then
