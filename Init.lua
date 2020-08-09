@@ -32,6 +32,35 @@ LibGuildHistoryCache.categoryText = {
   [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_GENERAL] = "General",
   [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_STORE] = "Store",
 }
+--[[
+GUILD_EVENT_ITEM_SOLD = 15
+]]--
+LibGuildHistoryCache.storeTableEnum = {
+  STORE_HISTORY_EVENT_TYPE = 1,
+  STORE_HISTORY_SECONDS_SINCE_EVENT = 2,
+  STORE_HISTORY_SELLER = 3,
+  STORE_HISTORY_BUYER = 4,
+  STORE_HISTORY_QTY_SOLD = 5,
+  STORE_HISTORY_ITEM_LINK = 6,
+  STORE_HISTORY_PRICE = 7,
+  STORE_HISTORY_TAXES = 8,
+  STORE_HISTORY_EVENTID = 9,
+}
+LibGuildHistoryCache.storeCategoryText = {
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE] = "Event Type",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT] = "Seconds Since Event",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SELLER] = "Seller",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_BUYER] = "Buyer",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_QTY_SOLD] = "Qty Sold",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_ITEM_LINK] = "Item Link",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE] = "Price",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES] = "Taxes",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID] = "EventID",
+}
+LibGuildHistoryCache.eventTypeText = {
+  [GUILD_HISTORY_GENERAL_ROSTER] = "Roster Update",
+  [GUILD_EVENT_ITEM_SOLD] = "Item Sold",
+}
 
 if LibDebugLogger then
   local logger = LibDebugLogger.Create(LibGuildHistoryCache.name)
