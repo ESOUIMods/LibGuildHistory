@@ -7,6 +7,14 @@ LibGuildHistoryCache.isScanning = false
 LibGuildHistoryCache.isScanningParallel = {}
 LibGuildHistoryCache.guildHistory = {}
 LibGuildHistoryCache.numberOfGuilds = 0
+LibGuildHistoryCache.oneHour = 3600
+LibGuildHistoryCache.oneDayInSeconds = 86400
+--[[
+used to temporarily ignore sales that are so new
+the ammount of time in seconds causes the UI to say
+the sale was made 1657 months ago or 71582789 minutes ago.
+]]--
+LibGuildHistoryCache.oneYearInSeconds = LibGuildHistoryCache.oneDayInSeconds * 365
 LibGuildHistoryCache.guildInfo = {
   [1] = { guildId = 0, guildName = 0, },
   [2] = { guildId = 0, guildName = 0, },
@@ -45,6 +53,7 @@ LibGuildHistoryCache.storeTableEnum = {
   STORE_HISTORY_PRICE = 7,
   STORE_HISTORY_TAXES = 8,
   STORE_HISTORY_EVENTID = 9,
+  STORE_HISTORY_TIMESTAMP = 10, -- this is not part of the data from server, custom value
 }
 LibGuildHistoryCache.storeCategoryText = {
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE] = "Event Type",
@@ -56,6 +65,7 @@ LibGuildHistoryCache.storeCategoryText = {
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE] = "Price",
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES] = "Taxes",
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID] = "EventID",
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID] = "Timestamp", -- this is not part of the data from server, custom value
 }
 LibGuildHistoryCache.eventTypeText = {
   [GUILD_HISTORY_GENERAL_ROSTER] = "Roster Update",

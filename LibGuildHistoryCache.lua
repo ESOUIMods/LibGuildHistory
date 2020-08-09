@@ -10,23 +10,35 @@ function LibGuildHistoryCache:GetGuildInfo()
   end
 end
 
+function LibGuildHistoryCache.NonContiguousNonNilCount(tableObject)
+  local count = 0
+
+  for _, v in pairs(tableObject)
+  do
+      if v ~= nil then count = count + 1 end
+  end
+
+  return count
+end
+
 --- Returns a guild events unique id
 function LibGuildHistoryCache:BuildSavedVarsTable(theEvent)
     local e = {}
-    e.eventType = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE] 
-    e.secsSince = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT] 
-    e.seller = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SELLER] 
-    e.buyer = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_BUYER] 
-    e.quantity = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_QTY_SOLD] 
-    e.itemName = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_ITEM_LINK] 
-    e.salePrice = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE] 
-    e.taxes = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES] 
+    e.eventType = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE]
+    e.secsSince = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
+    e.seller = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SELLER]
+    e.buyer = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_BUYER]
+    e.quantity = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_QTY_SOLD]
+    e.itemName = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_ITEM_LINK]
+    e.salePrice = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE]
+    e.taxes = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES]
+    e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
     return e
 end
 
---[[ 
-returns true is the infromation is the same, skips 
-secsSince because that will be different then the 
+--[[
+returns true is the infromation is the same, skips
+secsSince because that will be different then the
 saved vars data
 ]]--
 function compare(theEvent, cachedEvent)
@@ -49,19 +61,28 @@ function LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, ca
   local theEvent = {}
   local eventsAdded = 0
   local duplicateEvents = 0
+  if LibGuildHistoryCache_SavedVariables[guildID] == nil then LibGuildHistoryCache_SavedVariables[guildID] = {} end
   LibGuildHistoryCache.dm("Debug", string.format('ProcessGuildHistoryResponse: %s (%s) from event: %s', guildName, numEvents, eventTriggered))
   for i = 1, numEvents do
     local theEvent = { GetGuildEventInfo(guildID, GUILD_HISTORY_STORE, i) }
     local index = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID]
-    if LibGuildHistoryCache_SavedVariables[index] == nil then 
+    local timeSinceInSeconds = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
+    --[[ timeSinceInSeconds < LibGuildHistoryCache.oneYearInSeconds to
+    prevent adding an event with an erroneous ammount of time in seconds
+    since the sale was made.
+    ]]--
+    -- LibGuildHistoryCache.dm("Debug", #LibGuildHistoryCache_SavedVariables[130457])
+    if LibGuildHistoryCache_SavedVariables[guildID][index] == nil and timeSinceInSeconds < LibGuildHistoryCache.oneYearInSeconds then
       eventsAdded = eventsAdded + 1
-      LibGuildHistoryCache_SavedVariables[index] = {}
-      LibGuildHistoryCache_SavedVariables[index] = LibGuildHistoryCache:BuildSavedVarsTable(theEvent)
+      LibGuildHistoryCache_SavedVariables[guildID][index] = {}
+      LibGuildHistoryCache_SavedVariables[guildID][index] = LibGuildHistoryCache:BuildSavedVarsTable(theEvent)
     else
       duplicateEvents = duplicateEvents + 1
     end
   end
   LibGuildHistoryCache.dm("Debug", string.format("%s Processed (%s) events: New Sales (%s): Duplicate Sales (%s)", guildName, numEvents, eventsAdded, duplicateEvents))
+  local totalRecordsInGuild = LibGuildHistoryCache.NonContiguousNonNilCount(LibGuildHistoryCache_SavedVariables[guildID])
+  LibGuildHistoryCache.dm("Debug", string.format("Total records for %s (%s)", guildName, totalRecordsInGuild))
 end
 
 --- Handle Guild History Evert
@@ -91,5 +112,9 @@ local function OnAddOnLoaded(eventCode, addOnName)
    LibGuildHistoryCache.dm("Debug", "LibGuildHistoryCache Loaded")
    -- setup guild names and get guild IDs first
    LibGuildHistoryCache:GetGuildInfo()
+   if LibGuildHistoryCache_SavedVariables.version ~= 4 then
+    LibGuildHistoryCache_SavedVariables = {}
+    LibGuildHistoryCache_SavedVariables.version = 4
+   end
 end
 EVENT_MANAGER:RegisterForEvent(LibGuildHistoryCache.name, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
