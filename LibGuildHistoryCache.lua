@@ -1,6 +1,3 @@
-local megaserver = LibGuildHistoryCache.megaserver
-LibGuildHistoryCache_SavedVariables = LibGuildHistoryCache_SavedVariables or {}
-
 function LibGuildHistoryCache:GetGuildInfo()
   LibGuildHistoryCache.numberOfGuilds = GetNumGuilds()
 
@@ -56,12 +53,13 @@ function compare(theEvent, cachedEvent)
 end
 
 function LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, category, eventTriggered)
+  local megaserver = LibGuildHistoryCache.MegaserverGuildIDIndex(guildID)
   local guildName = GetGuildName(guildID)
   local numEvents = GetNumGuildEvents(guildID, GUILD_HISTORY_STORE)
   local theEvent = {}
   local eventsAdded = 0
   local duplicateEvents = 0
-  if LibGuildHistoryCache_SavedVariables[guildID] == nil then LibGuildHistoryCache_SavedVariables[guildID] = {} end
+  if LibGuildHistoryCache_SavedVariables[megaserver] == nil then LibGuildHistoryCache_SavedVariables[megaserver] = {} end
   LibGuildHistoryCache.dm("Debug", string.format('ProcessGuildHistoryResponse: %s (%s) from event: %s', guildName, numEvents, eventTriggered))
   for i = 1, numEvents do
     local theEvent = { GetGuildEventInfo(guildID, GUILD_HISTORY_STORE, i) }
@@ -71,17 +69,17 @@ function LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, ca
     prevent adding an event with an erroneous ammount of time in seconds
     since the sale was made.
     ]]--
-    -- LibGuildHistoryCache.dm("Debug", #LibGuildHistoryCache_SavedVariables[130457])
-    if LibGuildHistoryCache_SavedVariables[guildID][index] == nil and timeSinceInSeconds < LibGuildHistoryCache.oneYearInSeconds then
+    -- LibGuildHistoryCache.dm("Debug", #LibGuildHistoryCache_SavedVariables[130457@NA Megaserver])
+    if LibGuildHistoryCache_SavedVariables[megaserver][index] == nil and timeSinceInSeconds < LibGuildHistoryCache.oneYearInSeconds then
       eventsAdded = eventsAdded + 1
-      LibGuildHistoryCache_SavedVariables[guildID][index] = {}
-      LibGuildHistoryCache_SavedVariables[guildID][index] = LibGuildHistoryCache:BuildSavedVarsTable(theEvent)
+      LibGuildHistoryCache_SavedVariables[megaserver][index] = {}
+      LibGuildHistoryCache_SavedVariables[megaserver][index] = LibGuildHistoryCache:BuildSavedVarsTable(theEvent)
     else
       duplicateEvents = duplicateEvents + 1
     end
   end
   LibGuildHistoryCache.dm("Debug", string.format("%s Processed (%s) events: New Sales (%s): Duplicate Sales (%s)", guildName, numEvents, eventsAdded, duplicateEvents))
-  local totalRecordsInGuild = LibGuildHistoryCache.NonContiguousNonNilCount(LibGuildHistoryCache_SavedVariables[guildID])
+  local totalRecordsInGuild = LibGuildHistoryCache.NonContiguousNonNilCount(LibGuildHistoryCache_SavedVariables[megaserver])
   LibGuildHistoryCache.dm("Debug", string.format("Total records for %s (%s)", guildName, totalRecordsInGuild))
 end
 

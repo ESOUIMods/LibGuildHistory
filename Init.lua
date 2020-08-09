@@ -9,6 +9,7 @@ LibGuildHistoryCache.guildHistory = {}
 LibGuildHistoryCache.numberOfGuilds = 0
 LibGuildHistoryCache.oneHour = 3600
 LibGuildHistoryCache.oneDayInSeconds = 86400
+LibGuildHistoryCache_SavedVariables = LibGuildHistoryCache_SavedVariables or {}
 --[[
 used to temporarily ignore sales that are so new
 the ammount of time in seconds causes the UI to say
@@ -125,4 +126,9 @@ function LibGuildHistoryCache.dm(log_type, ...)
       emit_message(log_type, tostring(value))
     end
   end
+end
+
+function LibGuildHistoryCache.MegaserverGuildIDIndex(guildID)
+  index = guildID .. "@" .. LibGuildHistoryCache.megaserver
+  return index
 end
