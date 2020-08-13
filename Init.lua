@@ -37,12 +37,72 @@ LibGuildHistoryCache.categoryEnum = {
 }
 
 LibGuildHistoryCache.categoryText = {
-  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_ALLIANCE_WAR] = "Alliance War",
-  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_BANK] = "Bank",
-  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_COMBAT] = "Combat",
   [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_GENERAL] = "General",
+  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_BANK] = "Bank",
   [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_STORE] = "Store",
+  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_COMBAT] = "Combat",
+  [LibGuildHistoryCache.categoryEnum.GUILD_HISTORY_ALLIANCE_WAR] = "Alliance War",
 }
+
+-- alliance war
+LibGuildHistoryCache.avaTableEnum = {
+  AVA_HISTORY_EVENT_TYPE = 1,
+  AVA_HISTORY_SECONDS_SINCE_EVENT = 2,
+  AVA_HISTORY_GUILD_MEMBER = 3, -- if member did it
+
+  AVA_HISTORY_LOCATION_M = 4,
+  AVA_HISTORY_CAMPAIGN_M = 5,
+
+  AVA_HISTORY_LOCATION_NM = 3,
+  AVA_HISTORY_CAMPAIGN_NM = 4,
+
+  AVA_HISTORY_UNUSED_6 = 6,
+  AVA_HISTORY_UNUSED_7 = 7,
+  AVA_HISTORY_UNUSED_8 = 8,
+  AVA_HISTORY_EVENTID = 9,
+  AVA_HISTORY_TIMESTAMP = 10, -- this is not part of the data from server, custom value
+}
+
+--combat this seems unused
+LibGuildHistoryCache.combatTableEnum = {
+  COMBAT_HISTORY_EVENT_TYPE = 1,
+  COMBAT_HISTORY_SECONDS_SINCE_EVENT = 2,
+  COMBAT_HISTORY_GUILD_MEMBER = 3,
+  COMBAT_HISTORY_UNUSED_4 = 4,
+  COMBAT_HISTORY_UNUSED_5 = 5,
+  COMBAT_HISTORY_UNUSED_6 = 6,
+  COMBAT_HISTORY_UNUSED_7 = 7,
+  COMBAT_HISTORY_UNUSED_8 = 8,
+  COMBAT_HISTORY_EVENTID = 9,
+  COMBAT_HISTORY_TIMESTAMP = 10, -- this is not part of the data from server, custom value
+}
+
+LibGuildHistoryCache.generalTableEnum = {
+  GENERAL_HISTORY_EVENT_TYPE = 1,
+  GENERAL_HISTORY_SECONDS_SINCE_EVENT = 2,
+  GENERAL_HISTORY_GUILD_MEMBER = 3,
+  GENERAL_HISTORY_UNUSED_4 = 4,
+  GENERAL_HISTORY_UNUSED_5 = 5,
+  GENERAL_HISTORY_UNUSED_6 = 6,
+  GENERAL_HISTORY_UNUSED_7 = 7,
+  GENERAL_HISTORY_UNUSED_8 = 8,
+  GENERAL_HISTORY_EVENTID = 9,
+  GENERAL_HISTORY_TIMESTAMP = 10, -- this is not part of the data from server, custom value
+}
+
+LibGuildHistoryCache.bankTableEnum = {
+  BANK_HISTORY_EVENT_TYPE = 1,
+  BANK_HISTORY_SECONDS_SINCE_EVENT = 2,
+  BANK_HISTORY_GUILD_MEMBER = 3,
+  BANK_HISTORY_QTY = 4,
+  BANK_HISTORY_ITEM_LINK = 5,
+  BANK_HISTORY_UNUSED_6 = 6,
+  BANK_HISTORY_UNUSED_7 = 7,
+  BANK_HISTORY_UNUSED_8 = 8,
+  BANK_HISTORY_EVENTID = 9,
+  BANK_HISTORY_TIMESTAMP = 10, -- this is not part of the data from server, custom value
+}
+
 --[[
 GUILD_EVENT_ITEM_SOLD = 15
 ]]--
@@ -58,6 +118,7 @@ LibGuildHistoryCache.storeTableEnum = {
   STORE_HISTORY_EVENTID = 9,
   STORE_HISTORY_TIMESTAMP = 10, -- this is not part of the data from server, custom value
 }
+
 LibGuildHistoryCache.storeCategoryText = {
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE] = "Event Type",
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT] = "Seconds Since Event",
@@ -146,8 +207,7 @@ function LibGuildHistoryCache.SplitIndex(inputstr, sep)
 end
 
 function LibGuildHistoryCache.MegaserverGuildIDIndex(guildID, eventType)
-  local key = guildID .. "@" .. LibGuildHistoryCache.megaserver .. "@" .. eventType
-  if LibGuildHistoryCache_SavedVariables[key] == nil then LibGuildHistoryCache_SavedVariables[key] = {} end
-  local index = key
+  local index = string.format("%s@%s@%s", guildID, LibGuildHistoryCache.megaserver, eventType)
+  if LibGuildHistoryCache_SavedVariables[index] == nil then LibGuildHistoryCache_SavedVariables[index] = {} end
   return index
 end

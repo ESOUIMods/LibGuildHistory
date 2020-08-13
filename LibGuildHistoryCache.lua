@@ -19,17 +19,62 @@ function LibGuildHistoryCache.NonContiguousNonNilCount(tableObject)
 end
 
 --- Returns a guild events unique id
-function LibGuildHistoryCache:BuildSavedVarsTable(theEvent)
+function LibGuildHistoryCache:BuildSavedVarsTable(theEvent, category)
     local e = {}
-    e.eventType = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE]
-    e.secsSince = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
-    e.seller = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SELLER]
-    e.buyer = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_BUYER]
-    e.quantity = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_QTY_SOLD]
-    e.itemLink = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_ITEM_LINK]
-    e.salePrice = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE]
-    e.taxes = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES]
-    e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
+    -- general
+    if category == 1 then
+      e.eventType = theEvent[LibGuildHistoryCache.generalTableEnum.GENERAL_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.generalTableEnum.GENERAL_HISTORY_SECONDS_SINCE_EVENT]
+      e.guildMember = theEvent[LibGuildHistoryCache.generalTableEnum.GENERAL_HISTORY_GUILD_MEMBER]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.generalTableEnum.GENERAL_HISTORY_SECONDS_SINCE_EVENT]
+    end
+    -- bank
+    if category == 2 then
+      e.eventType = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_SECONDS_SINCE_EVENT]
+      e.guildMember = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_GUILD_MEMBER]
+      e.quantity = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_QTY]
+      e.itemLink = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_ITEM_LINK]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_SECONDS_SINCE_EVENT]
+    end
+    -- guild store
+    if category == 3 then
+      e.eventType = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
+      e.seller = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SELLER]
+      e.buyer = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_BUYER]
+      e.quantity = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_QTY_SOLD]
+      e.itemLink = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_ITEM_LINK]
+      e.salePrice = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE]
+      e.taxes = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
+    end
+    -- combat store, leave it so I can decode the table
+    if category == 4 then
+      e.eventType = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
+      e.seller = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SELLER]
+      e.buyer = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_BUYER]
+      e.quantity = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_QTY_SOLD]
+      e.itemLink = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_ITEM_LINK]
+      e.salePrice = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE]
+      e.taxes = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
+    end
+    -- alliance war
+    if category == 5 then
+      e.eventType = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_SECONDS_SINCE_EVENT]
+      if LibGuildHistoryCache.NonContiguousNonNilCount(theEvent) == 6 then
+        e.guildMember = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_GUILD_MEMBER]
+        e.location = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_LOCATION_M]
+        e.campaign = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_CAMPAIGN_M]
+      else
+        e.location = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_LOCATION_NM]
+        e.campaign = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_CAMPAIGN_NM]
+      end
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_SECONDS_SINCE_EVENT]
+    end
     return e
 end
 
@@ -52,17 +97,34 @@ function compare(theEvent, cachedEvent)
   return duplicateInfo
 end
 
-function LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, category, eventTriggered)
-  local megaserver
+function LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, category)
+  local megaserver = LibGuildHistoryCache.MegaserverGuildIDIndex(guildID, category)
   local guildName = GetGuildName(guildID)
-  local numEvents = GetNumGuildEvents(guildID, GUILD_HISTORY_STORE)
+  local numEvents = GetNumGuildEvents(guildID, category)
   local theEvent = {}
   local eventsAdded = 0
   local duplicateEvents = 0
-  LibGuildHistoryCache.dm("Debug", string.format('ProcessGuildHistoryResponse: %s (%s) from event: %s', guildName, numEvents, eventTriggered))
+  local extra = false
+  -- GUILD_HISTORY_STORE
+  LibGuildHistoryCache.dm("Debug", string.format('Process Guild History Response for: %s (%s) from category: %s', guildName, numEvents, LibGuildHistoryCache.categoryText[category]))
   for i = 1, numEvents do
-    local theEvent = { GetGuildEventInfo(guildID, GUILD_HISTORY_STORE, i) }
-    megaserver = LibGuildHistoryCache.MegaserverGuildIDIndex(guildID, theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE])
+    local theEvent = { GetGuildEventInfo(guildID, category, i) }
+    if category == 1 and i == 1 and extra then
+      LibGuildHistoryCache.dm("Debug", "category 4")
+      LibGuildHistoryCache.dm("Debug", theEvent)
+    end
+    if category == 2 and i == 1 and extra then
+      LibGuildHistoryCache.dm("Debug", "category 4")
+      LibGuildHistoryCache.dm("Debug", theEvent)
+    end
+    if category == 4 and i == 1 and extra then
+      LibGuildHistoryCache.dm("Debug", "category 4")
+      LibGuildHistoryCache.dm("Debug", theEvent)
+    end
+    if category == 5 and i == 1 and extra then
+      LibGuildHistoryCache.dm("Debug", "category 5")
+      LibGuildHistoryCache.dm("Debug", theEvent)
+    end
     local index = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID]
     local timeSinceInSeconds = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
 
@@ -73,20 +135,19 @@ function LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, ca
     prevent adding an event with an erroneous ammount of time in seconds
     since the sale was made.
     ]]--
-    -- LibGuildHistoryCache.dm("Debug", #LibGuildHistoryCache_SavedVariables[130457@NA Megaserver])
     if LibGuildHistoryCache_SavedVariables[megaserver][index] == nil and timeSinceInSeconds < LibGuildHistoryCache.oneYearInSeconds then
       eventsAdded = eventsAdded + 1
       LibGuildHistoryCache_SavedVariables[megaserver][index] = {}
-      LibGuildHistoryCache_SavedVariables[megaserver][index] = LibGuildHistoryCache:BuildSavedVarsTable(theEvent)
+      LibGuildHistoryCache_SavedVariables[megaserver][index] = LibGuildHistoryCache:BuildSavedVarsTable(theEvent, category)
     else
       duplicateEvents = duplicateEvents + 1
     end
   end
-  LibGuildHistoryCache.dm("Debug", string.format("%s Processed (%s) events: New Sales (%s): Duplicate Sales (%s)", guildName, numEvents, eventsAdded, duplicateEvents))
+  LibGuildHistoryCache.dm("Debug", string.format("%s Processed (%s) events: New Events (%s): Duplicate Events (%s)", guildName, numEvents, eventsAdded, duplicateEvents))
 
-  local totalRecordsInGuild = LibGuildHistoryCache.NonContiguousNonNilCount(LibGuildHistoryCache_SavedVariables[LibGuildHistoryCache.MegaserverGuildIDIndex(guildID, GUILD_HISTORY_STORE)])
+  local totalRecordsInGuild = LibGuildHistoryCache.NonContiguousNonNilCount(LibGuildHistoryCache_SavedVariables[megaserver])
 
-  LibGuildHistoryCache.dm("Debug", string.format("Total records for %s (%s)", guildName, totalRecordsInGuild))
+  LibGuildHistoryCache.dm("Debug", string.format("Total %s Events for %s [%s] : (%s)", LibGuildHistoryCache.categoryText[category], guildName, guildID, totalRecordsInGuild))
 end
 
 --- Handle Guild History Evert
@@ -96,12 +157,9 @@ local function OnGuildHistoryEvent(eventCode, guildID, category)
     end
    --LibGuildHistoryCache.dm("Debug", "OnGuildHistoryEvent")
    --LibGuildHistoryCache.dm("Debug", string.format("event code: %s guild ID: %s category: %s", eventCode, GetGuildName(guildID), LibGuildHistoryCache.categoryText[category]))
-   LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, category, "Guild History Received")
+   LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, category)
 end
 EVENT_MANAGER:RegisterForEvent(LibGuildHistoryCache.name, EVENT_GUILD_HISTORY_RESPONSE_RECEIVED, OnGuildHistoryEvent)
-
-function LibGuildHistoryCache:RequestPage(guildToScan, category, eventIndex)
-end
 
 --[[
 This is called when I am on the history tab and I press E.
