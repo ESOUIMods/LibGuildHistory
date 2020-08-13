@@ -11,7 +11,8 @@
 ## Version: 1.0
 ## AddOnVersion: 100
 ## SavedVariables: LibGuildHistoryCache_SavedVariables
-## DependsOn: LibDebugLogger>=196 DebugLogViewer
+## DependsOn: LibDebugLogger>=196
+## OptionalDependsOn: DebugLogViewer
 ## IsLibrary: true
 
 Init.lua

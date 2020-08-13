@@ -10,6 +10,8 @@ LibGuildHistoryCache.numberOfGuilds = 0
 LibGuildHistoryCache.oneHour = 3600
 LibGuildHistoryCache.oneDayInSeconds = 86400
 LibGuildHistoryCache_SavedVariables = LibGuildHistoryCache_SavedVariables or {}
+LibGuildHistoryCache.newestEvent = 0
+LibGuildHistoryCache.oldestEvent = 0
 --[[
 used to temporarily ignore sales that are so new
 the ammount of time in seconds causes the UI to say
@@ -17,11 +19,11 @@ the sale was made 1657 months ago or 71582789 minutes ago.
 ]]--
 LibGuildHistoryCache.oneYearInSeconds = LibGuildHistoryCache.oneDayInSeconds * 365
 LibGuildHistoryCache.guildInfo = {
-  [1] = { guildId = 0, guildName = 0, },
-  [2] = { guildId = 0, guildName = 0, },
-  [3] = { guildId = 0, guildName = 0, },
-  [4] = { guildId = 0, guildName = 0, },
-  [5] = { guildId = 0, guildName = 0, },
+  [1] = { guildID = 0, guildName = 0, },
+  [2] = { guildID = 0, guildName = 0, },
+  [3] = { guildID = 0, guildName = 0, },
+  [4] = { guildID = 0, guildName = 0, },
+  [5] = { guildID = 0, guildName = 0, },
 }
 LibGuildHistoryCache.data = {
  [LibGuildHistoryCache.megaserver] = {},
@@ -66,7 +68,7 @@ LibGuildHistoryCache.storeCategoryText = {
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE] = "Price",
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES] = "Taxes",
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID] = "EventID",
-  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID] = "Timestamp", -- this is not part of the data from server, custom value
+  [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TIMESTAMP] = "Timestamp", -- this is not part of the data from server, custom value
 }
 LibGuildHistoryCache.eventTypeText = {
   [GUILD_HISTORY_GENERAL_ROSTER] = "Roster Update",
@@ -81,11 +83,15 @@ local SDLV = DebugLogViewer
 if SDLV then LibGuildHistoryCache.viewer = true else LibGuildHistoryCache.viewer = false end
 
 local function create_log(log_type, log_content)
-  if log_type == "Debug" then
-    LibGuildHistoryCache.logger:Debug(log_content)
-  end
-  if log_type == "Verbose" then
-    LibGuildHistoryCache.logger:Verbose(log_content)
+  if LibGuildHistoryCache.viewer then
+    if log_type == "Debug" then
+      LibGuildHistoryCache.logger:Debug(log_content)
+    end
+    if log_type == "Verbose" then
+      LibGuildHistoryCache.logger:Verbose(log_content)
+    end
+  else
+    d(log_content)
   end
 end
 
@@ -117,7 +123,6 @@ local function emit_table(log_type, t, indent, table_history)
 end
 
 function LibGuildHistoryCache.dm(log_type, ...)
-  if not LibGuildHistoryCache.logger then return end
   for i = 1, select("#", ...) do
     local value = select(i, ...)
     if(type(value) == "table") then
@@ -128,7 +133,21 @@ function LibGuildHistoryCache.dm(log_type, ...)
   end
 end
 
-function LibGuildHistoryCache.MegaserverGuildIDIndex(guildID)
-  index = guildID .. "@" .. LibGuildHistoryCache.megaserver
+-- returns guildID, megaserver, eventType
+function LibGuildHistoryCache.SplitIndex(inputstr, sep)
+  if sep == nil then
+          sep = "%s"
+  end
+  local t={}
+  for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+          table.insert(t, str)
+  end
+  return t[1], t[2], t[3]
+end
+
+function LibGuildHistoryCache.MegaserverGuildIDIndex(guildID, eventType)
+  local key = guildID .. "@" .. LibGuildHistoryCache.megaserver .. "@" .. eventType
+  if LibGuildHistoryCache_SavedVariables[key] == nil then LibGuildHistoryCache_SavedVariables[key] = {} end
+  local index = key
   return index
 end
