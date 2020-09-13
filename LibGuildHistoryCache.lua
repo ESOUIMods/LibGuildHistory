@@ -19,26 +19,65 @@ function LibGuildHistoryCache.NonContiguousNonNilCount(tableObject)
 end
 
 --- Returns a guild events unique id
-function LibGuildHistoryCache:BuildSavedVarsTable(theEvent, category)
+function LibGuildHistoryCache:BuildSavedVarsTable(theEvent, eventType)
     local e = {}
-    -- general
-    if category == 1 then
-      e.eventType = theEvent[LibGuildHistoryCache.generalTableEnum.GENERAL_HISTORY_EVENT_TYPE]
-      e.secsSince = theEvent[LibGuildHistoryCache.generalTableEnum.GENERAL_HISTORY_SECONDS_SINCE_EVENT]
-      e.guildMember = theEvent[LibGuildHistoryCache.generalTableEnum.GENERAL_HISTORY_GUILD_MEMBER]
-      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.generalTableEnum.GENERAL_HISTORY_SECONDS_SINCE_EVENT]
-    end
-    -- bank
-    if category == 2 then
-      e.eventType = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_EVENT_TYPE]
-      e.secsSince = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_SECONDS_SINCE_EVENT]
-      e.guildMember = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_GUILD_MEMBER]
-      e.quantity = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_QTY]
-      e.itemLink = theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_ITEM_LINK]
-      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.bankTableEnum.BANK_HISTORY_SECONDS_SINCE_EVENT]
-    end
-    -- guild store
-    if category == 3 then
+    if eventType == GUILD_EVENT_GUILD_INVITE then -- 1 (eventType, displayName1, displayName2)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.displayName2 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_PROMOTE then -- 3 (eventType, displayName1, displayName2, rankName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.displayName2 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.rankName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM3]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_DEMOTE then -- 4 (eventType, displayName1, displayName2, rankName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.displayName2 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.rankName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM3]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_CREATE then -- 5 (eventType, displayName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_JOIN then -- 7 (eventType, joinerDisplayName, optionalInviterDisplayName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.joinerDisplayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.optionalInviterDisplayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_LEAVE then -- 8 (eventType, displayName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_KICKED then -- 12 (eventType, displayName1, displayName2)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.displayName2 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_BANKITEM_ADDED then -- 13 (eventType, displayName, itemQuantity, itemName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.itemQuantity = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.itemName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM3]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_BANKITEM_REMOVED then -- 14 (eventType, displayName, itemQuantity, itemName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.itemQuantity = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.itemName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM3]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_ITEM_SOLD then -- 15 (eventType, seller, buyer, quantity, itemLink, salePrice, taxes)
       e.eventType = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE]
       e.secsSince = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
       e.seller = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SELLER]
@@ -48,32 +87,120 @@ function LibGuildHistoryCache:BuildSavedVarsTable(theEvent, category)
       e.salePrice = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE]
       e.taxes = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES]
       e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
-    end
-    -- combat store, leave it so I can decode the table
-    if category == 4 then
-      e.eventType = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE]
-      e.secsSince = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
-      e.seller = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SELLER]
-      e.buyer = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_BUYER]
-      e.quantity = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_QTY_SOLD]
-      e.itemLink = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_ITEM_LINK]
-      e.salePrice = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_PRICE]
-      e.taxes = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TAXES]
-      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
-    end
-    -- alliance war
-    if category == 5 then
-      e.eventType = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_EVENT_TYPE]
-      e.secsSince = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_SECONDS_SINCE_EVENT]
-      if LibGuildHistoryCache.NonContiguousNonNilCount(theEvent) == 6 then
-        e.guildMember = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_GUILD_MEMBER]
-        e.location = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_LOCATION_M]
-        e.campaign = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_CAMPAIGN_M]
-      else
-        e.location = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_LOCATION_NM]
-        e.campaign = theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_CAMPAIGN_NM]
-      end
-      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.avaTableEnum.AVA_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_KEEP_CLAIMED then -- 16 (eventType, displayName, keepName, campaignName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.keepName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.campaignName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM3]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_KEEP_RELEASED then -- 19 (eventType, displayName, keepName, campaignName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.keepName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.campaignName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM3]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_KEEP_LOST then -- 17 (eventType, keepName, campaignName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.keepName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.campaignName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_MOTD_EDITED then -- 31 (eventType, displayName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_BANKGOLD_GUILD_STORE_TAX then -- 29 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_STORE_UNLOCKED then -- 33 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_STORE_LOCKED then -- 34 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_BANK_UNLOCKED then -- 35 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_BANK_LOCKED then -- 36 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_STANDARD_UNLOCKED then -- 37 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_STANDARD_LOCKED then -- 38 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_TABARD_UNLOCKED then -- 39 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_TABARD_LOCKED then -- 40 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_KIOSK_UNLOCKED then -- 42 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_KIOSK_LOCKED then -- 43 (eventType)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_APPLICATION_DECLINED then -- 44 (eventType, displayName1, displayName2)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.displayName2 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_APPLICATION_ACCEPTED then -- 45 (eventType, displayName1, displayName2)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.displayName2 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_ADDED_TO_BLACKLIST then -- 46 (eventType, displayName1, displayName2)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.displayName2 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_REMOVED_FROM_BLACKLIST then -- 47 (eventType, displayName1, displayName2)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.displayName2 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_RECRUITMENT_GUILD_LISTED then -- 50 (eventType, displayName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    elseif eventType == GUILD_EVENT_GUILD_RECRUITMENT_GUILD_UNLISTED then -- 51 (eventType, displayName)
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.displayName = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+    else
+      LibGuildHistoryCache.dm("Debug", string.format('eventType: %s : undefined', eventType))
+      e.eventType = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE]
+      e.secsSince = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
+      e.param1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM1]
+      e.param1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM2]
+      e.param1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM3]
+      e.param1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM4]
+      e.param1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM5]
+      e.param1 = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_PARAM6]
+      e.timestamp = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
     end
     return e
 end
@@ -104,32 +231,15 @@ function LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, ca
   local theEvent = {}
   local eventsAdded = 0
   local duplicateEvents = 0
-  local extra = false
   -- GUILD_HISTORY_STORE
   LibGuildHistoryCache.dm("Debug", string.format('Process Guild History Response for: %s (%s) from category: %s', guildName, numEvents, LibGuildHistoryCache.categoryText[category]))
   for i = 1, numEvents do
     local theEvent = { GetGuildEventInfo(guildID, category, i) }
-    if category == 1 and i == 1 and extra then
-      LibGuildHistoryCache.dm("Debug", "category 4")
-      LibGuildHistoryCache.dm("Debug", theEvent)
-    end
-    if category == 2 and i == 1 and extra then
-      LibGuildHistoryCache.dm("Debug", "category 4")
-      LibGuildHistoryCache.dm("Debug", theEvent)
-    end
-    if category == 4 and i == 1 and extra then
-      LibGuildHistoryCache.dm("Debug", "category 4")
-      LibGuildHistoryCache.dm("Debug", theEvent)
-    end
-    if category == 5 and i == 1 and extra then
-      LibGuildHistoryCache.dm("Debug", "category 5")
-      LibGuildHistoryCache.dm("Debug", theEvent)
-    end
-    local index = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID]
-    local timeSinceInSeconds = theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT]
+    local index = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENTID]
+    local timeSinceInSeconds = theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT]
 
-    if i == 1 then LibGuildHistoryCache.newestEvent = GetTimeStamp() - theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT] end
-    if i == numEvents then LibGuildHistoryCache.oldestEvent = GetTimeStamp() - theEvent[LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT] end
+    if i == 1 then LibGuildHistoryCache.newestEvent = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT] end
+    if i == numEvents then LibGuildHistoryCache.oldestEvent = GetTimeStamp() - theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_SECONDS_SINCE_EVENT] end
 
     --[[ timeSinceInSeconds < LibGuildHistoryCache.oneYearInSeconds to
     prevent adding an event with an erroneous ammount of time in seconds
@@ -138,7 +248,7 @@ function LibGuildHistoryCache:ProcessGuildHistoryResponse(eventCode, guildID, ca
     if LibGuildHistoryCache_SavedVariables[megaserver][index] == nil and timeSinceInSeconds < LibGuildHistoryCache.oneYearInSeconds then
       eventsAdded = eventsAdded + 1
       LibGuildHistoryCache_SavedVariables[megaserver][index] = {}
-      LibGuildHistoryCache_SavedVariables[megaserver][index] = LibGuildHistoryCache:BuildSavedVarsTable(theEvent, category)
+      LibGuildHistoryCache_SavedVariables[megaserver][index] = LibGuildHistoryCache:BuildSavedVarsTable(theEvent, theEvent[LibGuildHistoryCache.genericTableEnum.GENERIC_HISTORY_EVENT_TYPE])
     else
       duplicateEvents = duplicateEvents + 1
     end
@@ -164,10 +274,10 @@ EVENT_MANAGER:RegisterForEvent(LibGuildHistoryCache.name, EVENT_GUILD_HISTORY_RE
 --[[
 This is called when I am on the history tab and I press E.
 No other events fire that I am watching though.
-]]--
 ZO_PreHook("RequestMoreGuildHistoryCategoryEvents", function()
   LibGuildHistoryCache.dm("Debug", "RequestMoreGuildHistoryCategoryEvents was called")
 end)
+]]--
 
 local function OnAddOnLoaded(eventCode, addOnName)
    if addOnName ~= LibGuildHistoryCache.name then return end

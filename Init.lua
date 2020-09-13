@@ -119,6 +119,19 @@ LibGuildHistoryCache.storeTableEnum = {
   STORE_HISTORY_TIMESTAMP = 10, -- this is not part of the data from server, custom value
 }
 
+LibGuildHistoryCache.genericTableEnum = {
+  GENERIC_HISTORY_EVENT_TYPE = 1,
+  GENERIC_HISTORY_SECONDS_SINCE_EVENT = 2,
+  GENERIC_HISTORY_PARAM1 = 3,
+  GENERIC_HISTORY_PARAM2 = 4,
+  GENERIC_HISTORY_PARAM3 = 5,
+  GENERIC_HISTORY_PARAM4 = 6,
+  GENERIC_HISTORY_PARAM5 = 7,
+  GENERIC_HISTORY_PARAM6 = 8,
+  GENERIC_HISTORY_EVENTID = 9,
+  GENERIC_HISTORY_TIMESTAMP = 10, -- this is not part of the data from server, custom value
+}
+
 LibGuildHistoryCache.storeCategoryText = {
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENT_TYPE] = "Event Type",
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_SECONDS_SINCE_EVENT] = "Seconds Since Event",
@@ -131,6 +144,7 @@ LibGuildHistoryCache.storeCategoryText = {
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_EVENTID] = "EventID",
   [LibGuildHistoryCache.storeTableEnum.STORE_HISTORY_TIMESTAMP] = "Timestamp", -- this is not part of the data from server, custom value
 }
+
 LibGuildHistoryCache.eventTypeText = {
   [GUILD_HISTORY_GENERAL_ROSTER] = "Roster Update",
   [GUILD_EVENT_ITEM_SOLD] = "Item Sold",
